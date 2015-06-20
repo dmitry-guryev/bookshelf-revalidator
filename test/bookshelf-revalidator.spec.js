@@ -8,8 +8,10 @@ describe('bookshelf-revalidator', function() {
 
   // Setup
   var knex = require('knex')({
-    client: 'pg',
-    connection: 'postgres://localhost/test'
+    client: 'sqlite3',
+    connection: {
+      filename: __dirname + '/test.db'
+    }
   });
 
   var bookshelf = require('bookshelf')(knex);
@@ -19,37 +21,27 @@ describe('bookshelf-revalidator', function() {
 
   describe('validate()', function() {
 
-    var rules = {
-      user_id: {type: 'integer'},
-      name: {type: 'string', maxLength: 80, allowEmpty: false, required: true},
-      type: {enum: ['single', 'regular', 'transactional'], required: true},
-      personalized: {type: 'boolean', required: true},
-      from_email: {type: ['string', 'null'], format: 'email', maxLength: 40},
-      data: {type: 'object'},
-      single_schedule: {
-        conform: function (v) {
-          return v instanceof Date
-        }
-      }
-    };
     var Stuff = bookshelf.Model.extend({
       tableName: 'stuff',
-      rules: rules
+      rules: {
+        name: {type: 'string', maxLength: 80, allowEmpty: false, required: true},
+        email: {type: ['string', 'null'], format: 'email', maxLength: 40}
+      }
     });
 
     it('should validate ok', function() {
-      var stuff = new Stuff({from_email: 'foo@example.com'});
+      var stuff = new Stuff({email: 'foo@example.com'});
       stuff.validate().should.be.true;
       stuff.errors.should.be.eql([]);
     });
 
     it('should validate fail', function() {
-      var stuff = new Stuff({from_email: 'foo'});
+      var stuff = new Stuff({email: 'foo'});
       stuff.validate().should.be.false;
       stuff.errors.should.have.lengthOf(1);
       stuff.errors[0].should.be.eql({
         attribute: 'format',
-        property: 'from_email',
+        property: 'email',
         expected: 'email',
         actual: 'foo',
         message: 'is not a valid email'
@@ -57,15 +49,16 @@ describe('bookshelf-revalidator', function() {
     });
 
     it('should validate only passed attributes', function () {
-      var stuff = new Stuff({from_email: 'foo@example.com'});
+      var stuff = new Stuff({email: 'foo@example.com'});
       stuff.validate().should.be.true;
     });
 
     it('should require attributes', function() {
-      var stuff = new Stuff({name: 'John', data: {foo: 'bar'}});
+      var stuff = new Stuff({email: 'john@example.com'});
       stuff.validate(true).should.be.false;
-      stuff.errors.should.have.lengthOf(2); // 3 required fields, 1 is passed
-      _.every(stuff.errors, 'attribute', 'required').should.be.true;
+      stuff.errors.should.have.lengthOf(1);
+      stuff.errors[0].attribute.should.be.equal('required');
+      //_.every(stuff.errors, 'attribute', 'required').should.be.true;
     });
 
     it('should validate unknown attribute', function() {
@@ -82,7 +75,7 @@ describe('bookshelf-revalidator', function() {
     });
 
     it('should validate on insert', function(done) {
-      var stuff = new Stuff({ name: 'John' });
+      var stuff = new Stuff({ email: 'john@example.com' });
       stuff.save()
         .then(function() {
           throw new Error('Should throw ValidationError');
@@ -93,17 +86,17 @@ describe('bookshelf-revalidator', function() {
         .done();
     });
 
-    it('should validate on update', function(done) {
-      var stuff = new Stuff({ name: 'John' });
-      stuff.save()
-        .then(function() {
-          throw new Error('Should throw ValidationError');
-        })
-        .catch(Stuff.ValidationError, function() {
-          done();
-        })
-        .done();
-    });
+    //it('should validate on update', function(done) {
+    //  var stuff = new Stuff({ email: 'john@example.com' });
+    //  stuff.save()
+    //    .then(function() {
+    //      throw new Error('Should throw ValidationError');
+    //    })
+    //    .catch(Stuff.ValidationError, function() {
+    //      done();
+    //    })
+    //    .done();
+    //});
 
     it('should ignore non-existent attributes on save', function(done) {
       var stuff = new Stuff();
@@ -113,7 +106,7 @@ describe('bookshelf-revalidator', function() {
     });
 
     //it.skip('should ignore format if value is null', function() {
-    //  var stuff = new Stuff({ from_email: null });
+    //  var stuff = new Stuff({ email: null });
     //  var result = stuff.validate();
     //  console.log(stuff.errors);
     //  result.should.be.true;
