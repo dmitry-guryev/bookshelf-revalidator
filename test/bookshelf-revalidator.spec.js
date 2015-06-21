@@ -4,19 +4,22 @@ var _ = require('lodash');
 var should = require('should');
 
 
-describe('bookshelf-revalidator', function() {
-
-  // Setup
+function setupBookshelf() {
   var knex = require('knex')({
     client: 'sqlite3',
     connection: {
       filename: __dirname + '/test.db'
     }
   });
-
   var bookshelf = require('bookshelf')(knex);
-
   bookshelf.plugin(require('../bookshelf-revalidator'));
+  return bookshelf;
+}
+
+
+describe('bookshelf-revalidator', function() {
+
+  var bookshelf = setupBookshelf();
 
   var Stuff = bookshelf.Model.extend({
     tableName: 'stuff',
