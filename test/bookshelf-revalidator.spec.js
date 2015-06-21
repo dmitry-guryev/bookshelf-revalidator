@@ -18,16 +18,16 @@ describe('bookshelf-revalidator', function() {
 
   bookshelf.plugin(require('../bookshelf-revalidator'));
 
+  var Stuff = bookshelf.Model.extend({
+    tableName: 'stuff',
+    rules: {
+      name: {type: 'string', maxLength: 80, allowEmpty: false, required: true},
+      email: {type: ['string', 'null'], format: 'email', maxLength: 40}
+    }
+  });
+
 
   describe('validate()', function() {
-
-    var Stuff = bookshelf.Model.extend({
-      tableName: 'stuff',
-      rules: {
-        name: {type: 'string', maxLength: 80, allowEmpty: false, required: true},
-        email: {type: ['string', 'null'], format: 'email', maxLength: 40}
-      }
-    });
 
     it('should validate ok', function() {
       var stuff = new Stuff({email: 'foo@example.com'});
@@ -85,12 +85,7 @@ describe('bookshelf-revalidator', function() {
     //    .done();
     //});
 
-    it('should ignore non-existent attributes on save', function(done) {
-      var stuff = new Stuff();
-      stuff.safeSet({ name: 'Peter', badattr: 100 });
-      should(stuff.attributes).be.eql({ name: 'Peter' });
-      done();
-    });
+
 
     //it.skip('should ignore format if value is null', function() {
     //  var stuff = new Stuff({ email: null });
@@ -100,5 +95,16 @@ describe('bookshelf-revalidator', function() {
     //});
 
   });
+
+  describe('setOnlyListed()', function() {
+
+    it('should set only listed in rules attributes', function(done) {
+      var stuff = new Stuff();
+      stuff.setOnlyListed({ name: 'Peter', badattr: 100 });
+      should(stuff.attributes).be.eql({ name: 'Peter' });
+      done();
+    });
+
+  })
 
 });

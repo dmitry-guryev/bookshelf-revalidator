@@ -50,7 +50,7 @@ module.exports = function(bookshelf) {
     },
 
     // Устанавливает только те атрибуты, которые
-    safeSet: function(attributes) {
+    setOnlyListed: function(attributes) {
       var rules = this.rules;
       var safeAttributes = _.reduce(attributes, function(result, value, key) {
         if (rules.hasOwnProperty(key)) {
