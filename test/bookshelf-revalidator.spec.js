@@ -61,19 +61,6 @@ describe('bookshelf-revalidator', function() {
       //_.every(stuff.errors, 'attribute', 'required').should.be.true;
     });
 
-    it('should validate unknown attribute', function() {
-      var stuff = new Stuff({ nonexistent: 100500 });
-      stuff.validate().should.be.false;
-      stuff.errors.should.have.lengthOf(1);
-      stuff.errors[0].should.be.eql({
-        attribute: 'additionalProperties',
-        property: 'nonexistent',
-        expected: undefined,
-        actual: 100500,
-        message: 'must not exist'
-      });
-    });
-
     it('should validate on insert', function(done) {
       var stuff = new Stuff({ email: 'john@example.com' });
       stuff.save()

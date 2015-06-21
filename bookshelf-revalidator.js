@@ -43,7 +43,7 @@ module.exports = function(bookshelf) {
       var result = revalidator.validate(
         this.attributes,
         this._getJsonSchema(required),
-        { additionalProperties: false, cast: true }
+        { cast: true }
       );
       this.errors = result.errors;
       return result.valid;
