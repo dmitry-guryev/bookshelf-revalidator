@@ -61,32 +61,6 @@ describe('bookshelf-revalidator', function() {
       //_.every(stuff.errors, 'attribute', 'required').should.be.true;
     });
 
-    it('should validate on insert', function(done) {
-      var stuff = new Stuff({ email: 'john@example.com' });
-      stuff.save()
-        .then(function() {
-          throw new Error('Should throw ValidationError');
-        })
-        .catch(Stuff.ValidationError, function() {
-          done();
-        })
-        .done();
-    });
-
-    //it('should validate on update', function(done) {
-    //  var stuff = new Stuff({ email: 'john@example.com' });
-    //  stuff.save()
-    //    .then(function() {
-    //      throw new Error('Should throw ValidationError');
-    //    })
-    //    .catch(Stuff.ValidationError, function() {
-    //      done();
-    //    })
-    //    .done();
-    //});
-
-
-
     //it.skip('should ignore format if value is null', function() {
     //  var stuff = new Stuff({ email: null });
     //  var result = stuff.validate();
@@ -96,13 +70,38 @@ describe('bookshelf-revalidator', function() {
 
   });
 
+  describe('event handlers', function() {
+
+    it('should validate on insert', function(done) {
+      new Stuff().save({ email: 'bad-email' })
+        .then(function() {
+          throw new Error('Should throw ValidationError');
+        })
+        .catch(Stuff.ValidationError, function() {
+          done();
+        })
+        .done();
+    });
+
+    it('should validate on update', function(done) {
+      new Stuff().save({ email: 'bad-email' }, { method: 'update' })
+        .then(function() {
+          throw new Error('Should throw ValidationError');
+        })
+        .catch(Stuff.ValidationError, function() {
+          done();
+        })
+        .done();
+    });
+
+  });
+
   describe('setOnlyListed()', function() {
 
-    it('should set only listed in rules attributes', function(done) {
+    it('should set only listed in rules attributes', function() {
       var stuff = new Stuff();
       stuff.setOnlyListed({ name: 'Peter', badattr: 100 });
       should(stuff.attributes).be.eql({ name: 'Peter' });
-      done();
     });
 
   })
