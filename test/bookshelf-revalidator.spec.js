@@ -76,7 +76,7 @@ describe('bookshelf-revalidator', function() {
   describe('event handlers', function() {
 
     it('should validate on insert', function(done) {
-      new Stuff().save({ email: 'bad-email' })
+      new Stuff({ email: 'bad-email' }).save()
         .then(function() {
           throw new Error('Should throw ValidationError');
         })

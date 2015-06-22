@@ -29,16 +29,13 @@ module.exports = function(bookshelf) {
       });
     },
 
-    // Описание properties в формате JSON Schema
-    // см. https://www.npmjs.com/package/revalidator
-    // Важно: должен описывать все атрибуты, которые можно устанавливать,
-    // а read-only поля типа created_at, updated_at здесь лучше не указывать
+    // See https://www.npmjs.com/package/revalidator#schema
     rules: {},
 
-    // Сюда валидатор кладет ошибки валидации
+    // Last validation errors
     errors: [],
 
-    // Required = true для insert, false для update
+    // Required = true for insert, false for update
     validate: function(required) {
       var result = revalidator.validate(
         this.attributes,
@@ -49,7 +46,7 @@ module.exports = function(bookshelf) {
       return result.valid;
     },
 
-    // Устанавливает только те атрибуты, которые
+    // Sets only listed in rules attributes
     setOnlyListed: function(attributes) {
       var rules = this.rules;
       var safeAttributes = _.reduce(attributes, function(result, value, key) {

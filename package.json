@@ -1,6 +1,6 @@
 {
   "name": "bookshelf-revalidator",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Validation plugin for Bookshelf ORM",
   "main": "bookshelf-revalidator.js",
   "scripts": {
