@@ -80,7 +80,8 @@ describe('bookshelf-revalidator', function() {
         .then(function() {
           throw new Error('Should throw ValidationError');
         })
-        .catch(Stuff.ValidationError, function() {
+        .catch(Stuff.ValidationError, function(err) {
+          err.errors.should.be.an.Array;
           done();
         })
         .done();
@@ -91,7 +92,8 @@ describe('bookshelf-revalidator', function() {
         .then(function() {
           throw new Error('Should throw ValidationError');
         })
-        .catch(Stuff.ValidationError, function() {
+        .catch(Stuff.ValidationError, function(err) {
+          err.errors.should.be.an.Array;
           done();
         })
         .done();

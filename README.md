@@ -50,9 +50,9 @@ stuff.save()
   .then(function() {
     // All is ok, do something
   })
-  .catch(Stuff.ValidationError, function() {
+  .catch(Stuff.ValidationError, function(err) {
     // Validation error!
-    console.error(stuff.errors);
+    console.error(stuff.errors); // or err.errors 
   })
   .done();
 ```

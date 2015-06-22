@@ -3,9 +3,10 @@
 
 require('util').inherits(ValidationError, Error);
 
-function ValidationError(message) {
+function ValidationError(message, errors) {
   this.name = 'ValidationError';
   this.message = message || 'Invalid data';
+  this.errors = errors;
 }
 
 
@@ -22,10 +23,10 @@ module.exports = function(bookshelf) {
       proto.constructor.apply(this, arguments);
       var self = this;
       this.on('creating', function() {
-        if (!self.validate(true)) throw new Model.ValidationError();
+        if (!self.validate(true)) throw new Model.ValidationError(null, self.errors);
       });
       this.on('updating', function() {
-        if (!self.validate()) throw new Model.ValidationError();
+        if (!self.validate()) throw new Model.ValidationError(null, self.errors);
       });
     },
 
